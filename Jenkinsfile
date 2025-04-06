@@ -1,5 +1,5 @@
 pipeline {
-  agent { label 'master' }
+  agent any
 
   environment {
     AZURE_CLIENT_ID       = credentials('azure-client-id')
@@ -17,19 +17,19 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
-        git branch: 'main', url: 'https://github.com/Aviat-at/8935920-ci-cd-Assignment3'
+        git credentialsId: 'github-pat', branch: 'main', url: 'https://github.com/YOUR_USERNAME/YOUR_REPO.git'
       }
     }
 
     stage('Azure Login') {
       steps {
         sh '''
-          az login --service-principal \
-            -u "$AZURE_CLIENT_ID" \
-            -p "$AZURE_CLIENT_SECRET" \
-            --tenant "$AZURE_TENANT_ID"
+        az login --service-principal \
+          -u "$AZURE_CLIENT_ID" \
+          -p "$AZURE_CLIENT_SECRET" \
+          --tenant "$AZURE_TENANT_ID"
 
-          az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+        az account set --subscription "$AZURE_SUBSCRIPTION_ID"
         '''
       }
     }
@@ -37,26 +37,21 @@ pipeline {
     stage('Terraform Init & Apply') {
       steps {
         sh '''
-          terraform init
-          terraform plan -out=tfplan
-          terraform apply -auto-approve tfplan
+        terraform init
+        terraform plan -out=tfplan
+        terraform apply -auto-approve tfplan
         '''
-      }
-    }
-
-    stage('Zip Function Code') {
-      steps {
-        sh 'zip -r app.zip function_app.py requirements.txt host.json'
       }
     }
 
     stage('Deploy Azure Function') {
       steps {
         sh '''
-          az functionapp deployment source config-zip \
-            --resource-group "$TF_VAR_resource_group_name" \
-            --name "$TF_VAR_function_app_name" \
-            --src app.zip
+        zip -r app.zip function_app.py requirements.txt host.json
+        az functionapp deployment source config-zip \
+          --resource-group "$TF_VAR_resource_group_name" \
+          --name "$TF_VAR_function_app_name" \
+          --src app.zip
         '''
       }
     }
