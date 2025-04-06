@@ -17,7 +17,7 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
-        git credentialsId: 'github-pat', branch: 'main', url: 'https://github.com/YOUR_USERNAME/YOUR_REPO.git'
+        git credentialsId: 'github-pat', branch: 'main', url: 'https://github.com/Aviat-at/8935920-ci-cd-Assignment3'
       }
     }
 
