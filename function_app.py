@@ -4,7 +4,7 @@ import json
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
-@app.function_name(name="contact_api")
+@app.function_name(name="contactapi")
 @app.route(route="contact_api", methods=["POST"])
 def contact_api(req: func.HttpRequest) -> func.HttpResponse:
     logging.info("Contact API called")
